@@ -1,8 +1,14 @@
 from .base_shape import *
+from math import *
 
 class Triangle(BaseShape):
-    def __init__(self):
-        BaseShape.__init__(self)
+    def __init__(self,s0,s1,s2,color=None,label=False):
+        BaseShape.__init__(self,color)
+
+        self.s0=s0
+        self.s1=s1
+        self.s2=s2
+        self.label=label
 
     def generate(self):
         # Format de vertex
@@ -16,22 +22,18 @@ class Triangle(BaseShape):
 
         # Définissez les sommets du triangle
         vertices = [
-            Point3(0, 1, 0),  # Sommet 0
-            Point3(0, -1, 0),  # Sommet 1
-            Point3(0, 0, 1)   # Sommet 2
+            Point3(self.s0),  # Sommet 0
+            Point3(self.s1),  # Sommet 1
+            Point3(self.s2)   # Sommet 2
         ]
-
-        # Couleur rouge pour chaque sommet  b-v-r
-        color_red = Vec4(0, 0, 1, 1)  # Rouge
-        color_blue = Vec4(1, 0, 0, 1)  # Blue
 
         # Ajout des données de vertex et couleurs
         for pos in vertices:
             vertex.add_data3(pos)
-            color.add_data4(color_red)
+            color.add_data4(self.color)
         for pos in vertices:
             vertex.add_data3(pos)
-            color.add_data4(color_blue)
+            color.add_data4(self.color)
 
         # Création des triangles
         tris = GeomTriangles(Geom.UH_static)
@@ -48,7 +50,8 @@ class Triangle(BaseShape):
         triangle_np = NodePath(geom_node)
         
         # Ajouter des labels pour chaque sommet
-        self.add_labels(triangle_np,vertices)
+        if self.label:
+            self.add_labels(triangle_np,vertices)
         self.np=triangle_np
         return triangle_np
 
@@ -70,3 +73,16 @@ class Triangle(BaseShape):
             text_np.set_scale(1)
             # Légère élévation pour éviter le chevauchement avec le triangle
             text_np.set_y(text_np, 0.1)
+
+
+class EquilateralTriangle(Triangle):
+    def __init__(self,s0=(0,0,0),side_length=1,color=None):
+        x,y,z=s0
+        l=side_length/2
+        h = side_length*sqrt(3)/2
+        s1=(x+l,y,z+h)
+        s2=(x+side_length,y,z)
+        Triangle.__init__(self,s0,s1,s2,color,label=False)
+
+    
+
